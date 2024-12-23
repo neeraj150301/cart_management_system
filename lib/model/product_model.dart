@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class Product {
   final int id;
   final String title;
@@ -75,6 +77,60 @@ class Product {
       meta: Map<String, String>.from(json['meta']),
       images: List<String>.from(json['images']),
       thumbnail: json['thumbnail'],
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'category': category,
+      'price': price,
+      'discountPercentage': discountPercentage,
+      'rating': rating,
+      'stock': stock,
+      'tags': tags.join(','),
+      'brand': brand,
+      'sku': sku,
+      'weight': weight,
+      'dimensions': jsonEncode(dimensions),
+      'warrantyInformation': warrantyInformation,
+      'shippingInformation': shippingInformation,
+      'availabilityStatus': availabilityStatus,
+      'reviews': jsonEncode(reviews),
+      'returnPolicy': returnPolicy,
+      'minimumOrderQuantity': minimumOrderQuantity,
+      'meta': jsonEncode(meta),
+      'images': images.join(','),
+      'thumbnail': thumbnail,
+    };
+  }
+
+  factory Product.fromMap(Map<String, dynamic> map) {
+    return Product(
+      id: map['id'],
+      title: map['title'],
+      description: map['description'],
+      category: map['category'],
+      price: map['price'],
+      discountPercentage: map['discountPercentage'],
+      rating: map['rating'],
+      stock: map['stock'],
+      tags: map['tags'].split(','),
+      brand: map['brand'] ?? 'unknown',
+      sku: map['sku'],
+      weight: map['weight'],
+      dimensions: {},
+      warrantyInformation: map['warrantyInformation'],
+      shippingInformation: map['shippingInformation'],
+      reviews: [], 
+      availabilityStatus: map['availabilityStatus'],
+      returnPolicy: map['returnPolicy'],
+      minimumOrderQuantity: map['minimumOrderQuantity'],
+      meta: {}, 
+      images: map['images'].split(','),
+      thumbnail: map['thumbnail'],
     );
   }
 }

@@ -1,13 +1,20 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../../model/product_model.dart';
+import '../provider/cart_notifier_provider.dart';
 import '../screens/productDetails/product_details.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ProductCard extends StatelessWidget {
+class ProductCard extends ConsumerStatefulWidget {
   final Product product;
 
   const ProductCard({super.key, required this.product});
 
+  @override
+  ProductCardState createState() => ProductCardState();
+}
+
+class ProductCardState extends ConsumerState<ProductCard> {
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -15,7 +22,7 @@ class ProductCard extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ProductDetailPage(product: product),
+            builder: (context) => ProductDetailPage(product: widget.product),
           ),
         );
       },
@@ -37,7 +44,7 @@ class ProductCard extends StatelessWidget {
                     height: 70,
                     width: 70,
                     fit: BoxFit.cover,
-                    imageUrl: product.thumbnail,
+                    imageUrl: widget.product.thumbnail,
                     progressIndicatorBuilder:
                         (context, url, downloadProgress) => Padding(
                       padding: const EdgeInsets.all(100),
@@ -55,7 +62,7 @@ class ProductCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      product.title,
+                      widget.product.title,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
@@ -63,7 +70,7 @@ class ProductCard extends StatelessWidget {
                     ),
                     // const SizedBox(height: 5),
                     Text(
-                      '\$${product.price.toStringAsFixed(2)}',
+                      '\$${widget.product.price.toStringAsFixed(2)}',
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
@@ -74,12 +81,16 @@ class ProductCard extends StatelessWidget {
                       alignment: Alignment.bottomRight,
                       child: ElevatedButton(
                         onPressed: () {
+                          ref
+                              .read(cartProvider.notifier)
+                              .addToCart(widget.product);
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text("Added to Cart")),
                           );
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color.fromARGB(255, 158, 104, 228),
+                          backgroundColor:
+                              const Color.fromARGB(255, 158, 104, 228),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),

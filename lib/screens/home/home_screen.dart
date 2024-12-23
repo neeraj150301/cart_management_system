@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../provider/cart_notifier_provider.dart';
 import '../../provider/product_provider.dart';
 import '../../widgets/product_card.dart';
+import '../cart/cart_page.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -20,6 +22,11 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final productAsyncValue = ref.watch(productProvider);
+// final cartNotifier = ref.watch(cartProvider.notifier);
+    final totalItems = ref.watch(cartProvider).values.fold<int>(
+          0,
+          (previousValue, cartItem) => previousValue + cartItem.quantity,
+        );
 
     return Scaffold(
       appBar: AppBar(
@@ -29,18 +36,28 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
           style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,
-        actions: const [
+        actions: [
           badges.Badge(
             badgeContent: Text(
-              '0',
-              style: TextStyle(color: Colors.white),
+              totalItems.toString(),
+              style: const TextStyle(color: Colors.white),
             ),
-            child: Icon(
-              Icons.shopping_cart_outlined,
-              color: Colors.white,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CartPage(),
+                  ),
+                );
+              },
+              child: const Icon(
+                Icons.shopping_cart_outlined,
+                color: Colors.white,
+              ),
             ),
           ),
-          SizedBox(width: 20),
+          const SizedBox(width: 20),
         ],
       ),
       body: productAsyncValue.when(

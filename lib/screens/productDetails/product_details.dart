@@ -1,22 +1,60 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../../model/product_model.dart';
+import '../../provider/cart_notifier_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:badges/badges.dart' as badges;
+import '../cart/cart_page.dart';
 
-class ProductDetailPage extends StatelessWidget {
+class ProductDetailPage extends ConsumerStatefulWidget {
   final Product product;
 
   const ProductDetailPage({super.key, required this.product});
 
   @override
+  ProductDetailPageState createState() => ProductDetailPageState();
+}
+
+class ProductDetailPageState extends ConsumerState<ProductDetailPage> {
+  @override
   Widget build(BuildContext context) {
+    // final cartNotifier = ref.watch(cartProvider.notifier);
+    final totalItems = ref.watch(cartProvider).values.fold<int>(
+          0,
+          (previousValue, cartItem) => previousValue + cartItem.quantity,
+        );
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.primary,
         title: Text(
-          product.title,
+          widget.product.title,
           style: const TextStyle(color: Colors.white, fontSize: 18),
         ),
         centerTitle: true,
+        actions: [
+          badges.Badge(
+            badgeContent: Text(
+              totalItems.toString(),
+              style: const TextStyle(color: Colors.white),
+            ),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CartPage(),
+                  ),
+                );
+              },
+              child: const Icon(
+                Icons.shopping_cart_outlined,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          const SizedBox(width: 20),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -29,7 +67,7 @@ class ProductDetailPage extends StatelessWidget {
                   height: 250,
                   width: 250,
                   fit: BoxFit.cover,
-                  imageUrl: product.images.first,
+                  imageUrl: widget.product.images.first,
                   progressIndicatorBuilder: (context, url, downloadProgress) =>
                       Padding(
                     padding: const EdgeInsets.all(100),
@@ -42,12 +80,12 @@ class ProductDetailPage extends StatelessWidget {
               // Divider(),
               const SizedBox(height: 10),
               Text(
-                product.description,
+                widget.product.description,
                 style: const TextStyle(fontSize: 14, color: Colors.black54),
               ),
               const SizedBox(height: 10),
               Text(
-                'Category: ${product.category.toUpperCase()}',
+                'Category: ${widget.product.category.toUpperCase()}',
                 style: Theme.of(context).textTheme.titleMedium!.copyWith(
                       fontWeight: FontWeight.w500,
                     ),
@@ -60,14 +98,14 @@ class ProductDetailPage extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        '-${product.discountPercentage.toStringAsFixed(2)}%  ',
+                        '-${widget.product.discountPercentage.toStringAsFixed(2)}%  ',
                         style: Theme.of(context)
                             .textTheme
                             .headlineSmall!
                             .copyWith(color: Colors.red, fontSize: 14),
                       ),
                       Text(
-                        '\$${product.price.toStringAsFixed(2)}',
+                        '\$${widget.product.price.toStringAsFixed(2)}',
                         style: Theme.of(context)
                             .textTheme
                             .headlineSmall!
@@ -86,7 +124,7 @@ class ProductDetailPage extends StatelessWidget {
                       ),
                       const SizedBox(width: 5),
                       Text(
-                        '${product.rating}',
+                        '${widget.product.rating}',
                         style: Theme.of(context).textTheme.bodyLarge,
                       ),
                     ],
@@ -96,13 +134,13 @@ class ProductDetailPage extends StatelessWidget {
               const SizedBox(height: 10),
               const Divider(),
               Text(
-                'Brand: ${product.brand}',
+                'Brand: ${widget.product.brand}',
                 style: Theme.of(context).textTheme.titleMedium,
               ),
 
               const Divider(),
               Text(
-                'Stock: ${product.stock} Pcs',
+                'Stock: ${widget.product.stock} Pcs',
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               // const Divider(),
@@ -124,7 +162,7 @@ class ProductDetailPage extends StatelessWidget {
                           style: TextStyle(fontSize: 16),
                         ),
                         Text(
-                          '${product.weight} kg',
+                          '${widget.product.weight} kg',
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -143,7 +181,7 @@ class ProductDetailPage extends StatelessWidget {
                           style: TextStyle(fontSize: 16),
                         ),
                         Text(
-                          '${product.dimensions['width']} x ${product.dimensions['height']} x ${product.dimensions['depth']} cm',
+                          '${widget.product.dimensions['width']} x ${widget.product.dimensions['height']} x ${widget.product.dimensions['depth']} cm',
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -162,7 +200,7 @@ class ProductDetailPage extends StatelessWidget {
                           style: TextStyle(fontSize: 16),
                         ),
                         Text(
-                          product.warrantyInformation,
+                          widget.product.warrantyInformation,
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -181,7 +219,7 @@ class ProductDetailPage extends StatelessWidget {
                           style: TextStyle(fontSize: 16),
                         ),
                         Text(
-                          product.shippingInformation,
+                          widget.product.shippingInformation,
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -200,7 +238,7 @@ class ProductDetailPage extends StatelessWidget {
                           style: TextStyle(fontSize: 16),
                         ),
                         Text(
-                          product.availabilityStatus,
+                          widget.product.availabilityStatus,
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -219,7 +257,7 @@ class ProductDetailPage extends StatelessWidget {
                           style: TextStyle(fontSize: 16),
                         ),
                         Text(
-                          '${product.minimumOrderQuantity} Pcs',
+                          '${widget.product.minimumOrderQuantity} Pcs',
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -238,7 +276,7 @@ class ProductDetailPage extends StatelessWidget {
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 10),
-              ...product.reviews.map((review) {
+              ...widget.product.reviews.map((review) {
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 5),
                   child: Card(
@@ -266,20 +304,21 @@ class ProductDetailPage extends StatelessWidget {
                   ),
                 );
               }),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               Center(
                 child: ElevatedButton(
                   onPressed: () {
+                    ref.read(cartProvider.notifier).addToCart(widget.product);
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text("Added to Cart")),
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    backgroundColor: const Color.fromARGB(255, 158, 104, 228),
                     padding: const EdgeInsets.symmetric(
                         horizontal: 40, vertical: 12),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
+                      borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                   child: const Text(
@@ -288,6 +327,7 @@ class ProductDetailPage extends StatelessWidget {
                   ),
                 ),
               ),
+              const SizedBox(height: 10),
             ],
           ),
         ),
